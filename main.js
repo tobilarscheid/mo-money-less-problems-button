@@ -15,11 +15,11 @@ exports.main = async function main(params) {
 
             if (params.params.event === 'click') {
                 let placeOccupied = await mydaco.interface('KeyValueStore', 'get', { key: 'occupied' });
-                console.log(await mydaco.interface('Mail', 'sendMail', { text: JSON.stringify(params) + JSON.stringify(placeOccupied) }));
+                //console.log(await mydaco.interface('Mail', 'sendMail', { text: JSON.stringify(params) + JSON.stringify(placeOccupied) }));
                 await setOccupancy(!placeOccupied.value);
             }
             if (params.params.event === 'motion') {
-                await mydaco.interface('Mail', 'sendMail', { text: JSON.stringify(params) });
+                //await mydaco.interface('Mail', 'sendMail', { text: JSON.stringify(params) });
                 await mydaco.interface('KeyValueStore', 'put', { key: 'last_motion', value: Date.now() });
                 let placeOccupied = await mydaco.interface('KeyValueStore', 'get', { key: 'occupied' });
                 if (!placeOccupied.value) {
@@ -35,7 +35,10 @@ exports.main = async function main(params) {
             let placeOccupied = await mydaco.interface('KeyValueStore', 'get', { key: 'occupied' });
             if (Date.now() - lastMotion.value > 60000 && placeOccupied.value) {
                 console.log("no motion for long time");
-                await mydaco.interface('Mail', 'sendMail', { subject: 'Are you still home?', text: 'No movement detected for 24 hours - setting state to away.' })
+                await mydaco.interface('Mail', 'sendMail', { 
+                    subject: 'Are you still home?', 
+                    text: 'No movement detected for 24 hours - setting state to away.' 
+                });
                 await setOccupancy(false);
             }
         }
@@ -49,7 +52,7 @@ exports.main = async function main(params) {
 
 async function setOccupancy(occupied) {
     await mydaco.interface('KeyValueStore', 'put', { key: 'occupied', value: occupied });
-    await mydaco.interface('Mail', 'sendMail', { subject: 'set occupancy, occupied:' + occupied });
+    //await mydaco.interface('Mail', 'sendMail', { subject: 'set occupancy, occupied:' + occupied });
     if (occupied != true) {
         //turn lights off
         let lamp_id = await mydaco.interface('KeyValueStore', 'get', { key: 'lamp_id' });
